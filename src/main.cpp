@@ -17,7 +17,13 @@
 #include "node.hpp"
 
 int main(int argc, char * argv[]) {
+//	ROS_INFO("%d\n",CV_MAJOR_VERSION);
+//	ROS_INFO("%d\n",CV_MINOR_VERSION);
+	ROS_INFO("here0");
 	ros::init(argc, argv, ROS_PACKAGE_NAME);
+//	ros::NodeHandle n;
+//	image_transport::ImageTransport it(n);
+	ROS_INFO("here1");
 	camera_pose_calibration::CameraPoseCalibrationNode node;
 	ROS_INFO_STREAM(ROS_PACKAGE_NAME << " node initialized.");
 	ros::spin();

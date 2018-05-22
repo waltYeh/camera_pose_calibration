@@ -51,19 +51,23 @@ namespace {
 	/// Topic to read image from.
 	constexpr char const * image_topic = "image_color";
 }
-
+//structuralized 
 CameraPoseCalibrationNode::CameraPoseCalibrationNode() :
 	image_transport(node_handle),
 	calibrated(false)
 {
+	ROS_INFO("here");
+//	node_handle=n;
 	// initialize ros communication
 	cloud_publisher                    = node_handle.advertise<pcl::PointCloud<pcl::PointXYZ>>("cloud", 1, true);
 	target_cloud_publisher             = node_handle.advertise<pcl::PointCloud<pcl::PointXYZ>>("target", 1, true);
 	transformed_target_cloud_publisher = node_handle.advertise<pcl::PointCloud<pcl::PointXYZ>>("transformed_target", 1, true);
 	source_cloud_publisher             = node_handle.advertise<pcl::PointCloud<pcl::PointXYZ>>("source", 1, true);
 	projected_source_cloud_publisher   = node_handle.advertise<pcl::PointCloud<pcl::PointXYZ>>("projected_source", 1, true);
+//marker for rviz
 	calibration_plane_marker_publisher = node_handle.advertise<visualization_msgs::Marker>("calibration_plane", 1, true);
-	detected_pattern_publisher         = image_transport.advertise("detected_pattern", 1, true);
+//ros built-in image_transport
+//	detected_pattern_publisher         = image_transport.advertise("detected_pattern", 1, true);
 
 	calibrate_server_call  = node_handle.advertiseService("calibrate_call",  &CameraPoseCalibrationNode::onCalibrateCall,  this);
 	calibrate_server_topic = node_handle.advertiseService("calibrate_topic", &CameraPoseCalibrationNode::onCalibrateTopic, this);
@@ -76,6 +80,8 @@ CameraPoseCalibrationNode::CameraPoseCalibrationNode() :
 	if (publish_transform) {
 		tf_timer = node_handle.createTimer(publish_rate, &CameraPoseCalibrationNode::onTfTimeout, this);
 	}
+	
+
 }
 
 visualization_msgs::Marker CameraPoseCalibrationNode::createCalibrationPlaneMarker(
@@ -100,36 +106,41 @@ visualization_msgs::Marker CameraPoseCalibrationNode::createCalibrationPlaneMark
 
 	// triangle 1
 	geometry_msgs::Point triangle_point;
-	triangle_point.x = points->points[0].x;
+	triangle_point.x = points->points[0].x;//first
 	triangle_point.y = points->points[0].y;
 	triangle_point.z = points->points[0].z;
 	calibration_plane.points.push_back(triangle_point);
-	triangle_point.x = points->points[(pattern_height - 1) * pattern_width].x;
+	triangle_point.x = points->points[(pattern_height - 1) * pattern_width].x;//last row first col
 	triangle_point.y = points->points[(pattern_height - 1) * pattern_width].y;
 	triangle_point.z = points->points[(pattern_height - 1) * pattern_width].z;
 	calibration_plane.points.push_back(triangle_point);
-	triangle_point.x = points->points[pattern_width - 1].x;
+	triangle_point.x = points->points[pattern_width - 1].x;//last col, first row
 	triangle_point.y = points->points[pattern_width - 1].y;
 	triangle_point.z = points->points[pattern_width - 1].z;
 	calibration_plane.points.push_back(triangle_point);
 
 	// triangle 2
-	triangle_point.x = points->points[pattern_height * pattern_width - 1].x;
+	triangle_point.x = points->points[pattern_height * pattern_width - 1].x;//last row last col
 	triangle_point.y = points->points[pattern_height * pattern_width - 1].y;
 	triangle_point.z = points->points[pattern_height * pattern_width - 1].z;
 	calibration_plane.points.push_back(triangle_point);
-	triangle_point.x = points->points[pattern_width - 1].x;
+	triangle_point.x = points->points[pattern_width - 1].x;//last col, first row
 	triangle_point.y = points->points[pattern_width - 1].y;
 	triangle_point.z = points->points[pattern_width - 1].z;
 	calibration_plane.points.push_back(triangle_point);
-	triangle_point.x = points->points[(pattern_height - 1) * pattern_width].x;
+	triangle_point.x = points->points[(pattern_height - 1) * pattern_width].x;//last row first col
 	triangle_point.y = points->points[(pattern_height - 1) * pattern_width].y;
 	triangle_point.z = points->points[(pattern_height - 1) * pattern_width].z;
 	calibration_plane.points.push_back(triangle_point);
-
+//	[]-------------------[]
+//  |               /    |
+//  |         /          |
+//  |    /               |
+//  []-------------------[]
+	//form 2 triangles
 	return calibration_plane;
 }
-
+//execute at a predefined frequency
 void CameraPoseCalibrationNode::onTfTimeout(ros::TimerEvent const &) {
 	if (calibrated) {
 		calibration_transform.stamp_ = ros::Time::now();

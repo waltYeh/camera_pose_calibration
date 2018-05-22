@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.1)
 project(camera_pose_calibration)
-
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_CXX_STANDARD 11)
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O1")
+set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 set(CMAKE_CXX_EXTENSIONS off)
 add_compile_options(-Wall -Wextra)
@@ -20,8 +22,15 @@ find_package(catkin REQUIRED COMPONENTS
 	tf_conversions
 	visualization_msgs
 )
+#include(${PROJ_SOURCE_DIR} include/Eigen3/cmake/FindEigen3.cmake)
+#find_package(Eigen3 REQUIRED)
+find_package(Eigen 3 QUIET)
+if(NOT Eigen_FOUND)
+  include(${PROJ_SOURCE_DIR} include/Eigen3/cmake/FindEigen3.cmake)
+  set(Eigen_INCLUDE_DIR include/Eigen3)
+endif()
+include_directories(${Eigen_INCLUDE_DIR})
 
-find_package(Eigen3 REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(PCL REQUIRED)
 find_package(Boost REQUIRED)
@@ -35,7 +44,9 @@ generate_messages(DEPENDENCIES
 	sensor_msgs
 )
 
-catkin_package()
+catkin_package(
+#  CATKIN_DEPENDS image_transport
+)
 
 include_directories(
 	include/${PROJECT_NAME}
