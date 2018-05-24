@@ -77,6 +77,10 @@ add_dependencies(${PROJECT_NAME}_nodelet ${PROJECT_NAME}_gencpp)
 
 add_executable(${PROJECT_NAME}_node src/main.cpp)
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME}_nodelet)
+add_executable(${PROJECT_NAME}_client_file src/client_file.cpp)
+target_link_libraries(${PROJECT_NAME}_client_file ${PROJECT_NAME}_nodelet)
+
+
 
 if(CATKIN_ENABLE_TESTING)
 	catkin_add_gtest(${PROJECT_NAME}_test test/${PROJECT_NAME}.cpp)

@@ -132,6 +132,7 @@ visualization_msgs::Marker CameraPoseCalibrationNode::createCalibrationPlaneMark
 	triangle_point.y = points->points[(pattern_height - 1) * pattern_width].y;
 	triangle_point.z = points->points[(pattern_height - 1) * pattern_width].z;
 	calibration_plane.points.push_back(triangle_point);
+	calibration_plane.lifetime = ros::Duration();//never delete
 //	[]-------------------[]
 //  |               /    |
 //  |         /          |
@@ -277,6 +278,7 @@ bool CameraPoseCalibrationNode::onCalibrateFile(camera_pose_calibration::Calibra
 	std::string image_path = req.image;
 	std_msgs::Header header;
 	header.frame_id = req.camera_frame;
+//	header.frame_id = req.target_frame;
 	cv_bridge::CvImage image_msg(header, sensor_msgs::image_encodings::BGR8, cv::imread(image_path));
 	if (!image_msg.image.data) {
 		ROS_ERROR_STREAM("Failed to read image from " << image_path << ".");
@@ -294,7 +296,8 @@ bool CameraPoseCalibrationNode::onCalibrateFile(camera_pose_calibration::Calibra
 		return false;
 	}
 
-	pcl_cloud->header.frame_id   = req.camera_frame;
+	pcl_cloud->header.frame_id  = req.camera_frame;
+//	pcl_cloud->header.frame_id  = req.target_frame;
 	pcl_conversions::toPCL(ros::Time::now(), pcl_cloud->header.stamp);
 
 	sensor_msgs::PointCloud2 cloud;
